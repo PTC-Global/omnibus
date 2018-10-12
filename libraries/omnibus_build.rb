@@ -59,6 +59,9 @@ class Chef
     attribute :live_stream,
               kind_of: [TrueClass, FalseClass],
               default: false
+    attribute :timeout,
+              kind_of: Integer,
+              default: 7200
   end
 
   class Provider::OmnibusBuild < Provider::LWRPBase
@@ -141,6 +144,7 @@ class Chef
         CODE
       )
       execute.cwd(new_resource.project_dir)
+      execute.timeout(new_resource.timeout)
       execute.environment(environment)
       execute.live_stream(new_resource.live_stream)
       execute.user(new_resource.build_user)
@@ -175,6 +179,7 @@ class Chef
       execute = Resource::Execute.new("#{new_resource.project_name}: #{command}", run_context)
       execute.command("call #{windows_safe_path_join(build_user_home, 'load-omnibus-toolchain.bat')} && #{command}")
       execute.cwd(new_resource.project_dir)
+      execute.timeout(new_resource.timeout)
       execute.environment(new_resource.environment)
       execute.live_stream(new_resource.live_stream)
       execute.run_action(:run)
